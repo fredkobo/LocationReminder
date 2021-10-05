@@ -12,6 +12,7 @@ import android.view.*
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
+import androidx.navigation.fragment.findNavController
 import com.google.android.gms.location.*
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -28,14 +29,14 @@ import com.google.android.gms.maps.model.LatLng
 import java.util.*
 
 
-class SelectLocationFragment : BaseFragment(), OnMapReadyCallback, LocationListener {
+class SelectLocationFragment : BaseFragment(), OnMapReadyCallback, GoogleMap.OnPoiClickListener, LocationListener {
 
     //Use Koin to get the view model of the SaveReminder
     override val _viewModel: SaveReminderViewModel by inject()
     private lateinit var binding: FragmentSelectLocationBinding
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
     private lateinit var map: GoogleMap
-    private lateinit var selectedLatLng : LatLng
+    private lateinit var selectedPoi : PointOfInterest
 
     companion object {
         const val TAG = "SelectLocationFragment"
@@ -65,9 +66,6 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback, LocationListe
             onLocationSelected()
         }
 
-//        TODO: call this function after the user confirms on the selected location
-        onLocationSelected()
-
         return binding.root
     }
 
@@ -75,6 +73,13 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback, LocationListe
         //        TODO: When the user confirms on the selected location,
         //         send back the selected location details to the view model
         //         and navigate back to the previous fragment to save the reminder and add the geofence
+        if(this::selectedPoi.isInitialized) {
+            _viewModel.latitude.value = selectedPoi.latLng.latitude
+            _viewModel.longitude.value = selectedPoi.latLng.longitude
+            _viewModel.reminderSelectedLocationStr.value = selectedPoi.name
+            _viewModel.selectedPOI.value = selectedPoi
+        }
+        findNavController().popBackStack()
     }
 
 
@@ -107,7 +112,7 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback, LocationListe
 
         enableMyLocation()
         setMapStyle(googleMap)
-        setMapLongClick(googleMap)
+        map.setOnPoiClickListener(this)
     }
 
     @SuppressLint("MissingPermission")
@@ -187,28 +192,6 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback, LocationListe
         }
     }
 
-    private fun setMapLongClick(map:GoogleMap) {
-        map.setOnMapLongClickListener {  latLng ->
-            val snippet = String.format(
-                Locale.getDefault(),
-                "Lat: %1$.5f, Long: %2$.5f",
-                latLng.latitude,
-                latLng.longitude
-            )
-
-            map.addMarker(
-                MarkerOptions()
-                    .position(latLng)
-                    .title(getString(R.string.dropped_pin))
-                    .snippet(snippet)
-                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ROSE))
-            )
-
-            selectedLatLng = latLng
-            binding.saveButton.visibility = View.VISIBLE
-        }
-    }
-
     private fun setMapStyle(map: GoogleMap) {
         try {
             // Customize the styling of the base map using a JSON object defined
@@ -226,5 +209,32 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback, LocationListe
         } catch (e: Resources.NotFoundException) {
             Log.e(TAG, "Can't find style. Error: ", e)
         }
+    }
+
+    override fun onPoiClick(poi: PointOfInterest) {
+        selectedPoi = PointOfInterest(poi.latLng, poi.placeId, poi.name)
+        showMarker(poi.latLng.latitude, poi.latLng.longitude, poi.name)
+    }
+
+    private fun showMarker(lat: Double, lng:Double, title:String) {
+        map.clear()
+        val snippet = String.format(
+            Locale.getDefault(),
+            "Lat: %1$.5f, Long: %2$.5f",
+            lat,
+            lng
+        )
+
+        val latLng = LatLng(lat, lng)
+        map.addMarker(
+            MarkerOptions()
+                .position(latLng)
+                .title(title)
+                .snippet(snippet)
+                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ROSE))
+        ).showInfoWindow()
+
+        map.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, MAP_ZOOM))
+        binding.saveButton.visibility = View.VISIBLE
     }
 }
