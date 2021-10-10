@@ -29,14 +29,15 @@ import com.google.android.gms.maps.model.LatLng
 import java.util.*
 
 
-class SelectLocationFragment : BaseFragment(), OnMapReadyCallback, GoogleMap.OnPoiClickListener, LocationListener {
+class SelectLocationFragment : BaseFragment(), OnMapReadyCallback, GoogleMap.OnPoiClickListener,
+    LocationListener {
 
     //Use Koin to get the view model of the SaveReminder
     override val _viewModel: SaveReminderViewModel by inject()
     private lateinit var binding: FragmentSelectLocationBinding
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
     private lateinit var map: GoogleMap
-    private lateinit var selectedPoi : PointOfInterest
+    private lateinit var selectedPoi: PointOfInterest
 
     companion object {
         const val TAG = "SelectLocationFragment"
@@ -60,7 +61,7 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback, GoogleMap.OnP
             .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
 
-        fusedLocationProviderClient =  LocationServices.getFusedLocationProviderClient(context!!)
+        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(context!!)
 
         binding.saveButton.setOnClickListener {
             onLocationSelected()
@@ -70,10 +71,7 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback, GoogleMap.OnP
     }
 
     private fun onLocationSelected() {
-        //        TODO: When the user confirms on the selected location,
-        //         send back the selected location details to the view model
-        //         and navigate back to the previous fragment to save the reminder and add the geofence
-        if(this::selectedPoi.isInitialized) {
+        if (this::selectedPoi.isInitialized) {
             _viewModel.latitude.value = selectedPoi.latLng.latitude
             _viewModel.longitude.value = selectedPoi.latLng.longitude
             _viewModel.reminderSelectedLocationStr.value = selectedPoi.name
@@ -170,23 +168,27 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback, GoogleMap.OnP
          * cases when a location is not available.
          */
         try {
-                val locationResult = fusedLocationProviderClient.lastLocation
-                locationResult.addOnCompleteListener(activity!!) { task ->
-                    if (task.isSuccessful) {
-                        // Set the map's camera position to the current location of the device.
-                        var lastKnownLocation = task.result
-                        if (lastKnownLocation != null) {
-                            map.moveCamera(CameraUpdateFactory.newLatLngZoom(
+            val locationResult = fusedLocationProviderClient.lastLocation
+            locationResult.addOnCompleteListener(activity!!) { task ->
+                if (task.isSuccessful) {
+                    // Set the map's camera position to the current location of the device.
+                    var lastKnownLocation = task.result
+                    if (lastKnownLocation != null) {
+                        map.moveCamera(
+                            CameraUpdateFactory.newLatLngZoom(
                                 LatLng(
                                     lastKnownLocation.latitude,
-                                    lastKnownLocation.longitude), MAP_ZOOM))
-                        }
-                    } else {
-                        Log.d(TAG, "Current location is null. Using defaults.")
-                        Log.e(TAG, "Exception: %s", task.exception)
-                        map.uiSettings?.isMyLocationButtonEnabled = false
+                                    lastKnownLocation.longitude
+                                ), MAP_ZOOM
+                            )
+                        )
                     }
+                } else {
+                    Log.d(TAG, "Current location is null. Using defaults.")
+                    Log.e(TAG, "Exception: %s", task.exception)
+                    map.uiSettings?.isMyLocationButtonEnabled = false
                 }
+            }
         } catch (e: SecurityException) {
             Log.e("Exception: %s", e.message, e)
         }
@@ -216,7 +218,7 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback, GoogleMap.OnP
         showMarker(poi.latLng.latitude, poi.latLng.longitude, poi.name)
     }
 
-    private fun showMarker(lat: Double, lng:Double, title:String) {
+    private fun showMarker(lat: Double, lng: Double, title: String) {
         map.clear()
         val snippet = String.format(
             Locale.getDefault(),
