@@ -5,14 +5,12 @@ import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
+import com.google.common.truth.Truth.assertThat
 import com.udacity.project4.locationreminders.data.dto.ReminderDTO
 import com.udacity.project4.locationreminders.data.dto.Result
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
-import org.hamcrest.CoreMatchers.`is`
-import org.hamcrest.CoreMatchers.instanceOf
-import org.hamcrest.MatcherAssert.assertThat
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
@@ -21,10 +19,88 @@ import org.junit.runner.RunWith
 
 @ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)
-//Medium Test to test the repository
 @MediumTest
 class RemindersLocalRepositoryTest {
 
-//    TODO: Add testing implementation to the RemindersLocalRepository.kt
+    private lateinit var database: RemindersDatabase
+    private lateinit var repository: RemindersLocalRepository
 
+    private val reminderData = ReminderDTO(
+        title = "Test",
+        description = "testing",
+        location = "test",
+        latitude = 2.343434343,
+        longitude = 1.231424
+    )
+
+    @get:Rule
+    val instantTaskExecutorRule = InstantTaskExecutorRule()
+
+    @Before
+    fun initDatabase() {
+        database = Room.inMemoryDatabaseBuilder(
+            ApplicationProvider.getApplicationContext(),
+            RemindersDatabase::class.java
+        ).allowMainThreadQueries().build()
+
+        repository = RemindersLocalRepository(database.reminderDao(), Dispatchers.Main)
+    }
+
+    @After
+    fun closeDatabase() {
+        database.close()
+    }
+
+    @Test
+    fun insertReminderSucceeds() = runBlocking {
+        repository.saveReminder(reminderData)
+
+        val result = repository.getReminders()
+        assertThat(result).isInstanceOf(Result.Success::class.java)
+
+        result as Result.Success
+
+        assertThat(result.data).isNotEmpty()
+        assertThat(result.data).hasSize(1)
+    }
+
+    @Test
+    fun retrieveExistingReminderSucceeds() = runBlocking {
+        repository.saveReminder(reminderData)
+
+        val result = repository.getReminder(reminderData.id)
+        assertThat(result).isInstanceOf(Result.Success::class.java)
+
+        result as Result.Success
+
+        assertThat(result.data).isNotNull()
+        assertThat(result.data.title).isEqualTo(reminderData.title)
+        assertThat(result.data.description).isEqualTo(reminderData.description)
+        assertThat(result.data.location).isEqualTo(reminderData.location)
+        assertThat(result.data.latitude).isEqualTo(reminderData.latitude)
+        assertThat(result.data.longitude).isEqualTo(reminderData.longitude)
+    }
+
+    @Test
+    fun retrieveNonExistingReminderFails() = runBlocking {
+        val result = repository.getReminder(reminderData.id)
+        assertThat(result).isInstanceOf(Result.Error::class.java)
+
+        result as Result.Error
+
+        assertThat(result.message).isEqualTo("Reminder not found!")
+        assertThat(result.statusCode).isNull()
+    }
+
+    @Test
+    fun deleteRemindersSucceeds() = runBlocking {
+        repository.saveReminder(reminderData)
+        repository.deleteAllReminders()
+
+        val result = repository.getReminders()
+        assertThat(result).isInstanceOf(Result.Success::class.java)
+
+        result as Result.Success
+        assertThat(result.data).isEmpty()
+    }
 }

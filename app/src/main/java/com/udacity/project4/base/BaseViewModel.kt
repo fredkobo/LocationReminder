@@ -3,7 +3,7 @@ package com.udacity.project4.base
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
-import com.udacity.project4.utils.SingleLiveEvent
+import com.udacity.project4.util.SingleLiveEvent
 
 /**
  * Base class for View Models to declare the common LiveData objects in one place
