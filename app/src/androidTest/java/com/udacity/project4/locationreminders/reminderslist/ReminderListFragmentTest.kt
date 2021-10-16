@@ -107,11 +107,11 @@ class ReminderListFragmentTest {
     @Test
     fun withReminders_showsOnScreen() {
         val validDataItem = ReminderDataItem(
-            title = "Take AlienX on a Date",
-            description = "Testing",
-            location = "Area 51",
-            latitude = 2.344234234,
-            longitude = 1.34234234
+            title = "Do some shopping",
+            description = "Go buy supplies at mall",
+            location = "Mall of Africa",
+            latitude = -25.98945,
+            longitude = 28.907532
         )
 
         val reminder = validDataItem.toDTO()
