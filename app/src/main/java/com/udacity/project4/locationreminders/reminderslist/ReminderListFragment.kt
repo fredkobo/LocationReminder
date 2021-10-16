@@ -62,6 +62,10 @@ class ReminderListFragment : BaseFragment() {
         binding.addReminderFAB.setOnClickListener {
             navigateToAddReminder()
         }
+        binding.refreshLayout.setOnRefreshListener {
+            _viewModel.loadReminders()
+            binding.refreshLayout.isRefreshing = false
+        }
     }
 
     override fun onResume() {

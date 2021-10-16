@@ -13,4 +13,13 @@ data class ReminderDataItem(
     var latitude: Double?,
     var longitude: Double?,
     val id: String = UUID.randomUUID().toString()
-) : Serializable
+) : Serializable {
+    val locationString: String
+        get() {
+            if (location != null) {
+                return location as String
+            }
+
+            return "Lat: $latitude Lon: $longitude"
+        }
+}
