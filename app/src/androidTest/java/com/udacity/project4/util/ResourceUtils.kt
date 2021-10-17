@@ -1,4 +1,4 @@
-package com.udacity.project4.locationreminders.util
+package com.udacity.project4.util
 
 import android.content.Context
 import androidx.annotation.StringRes
