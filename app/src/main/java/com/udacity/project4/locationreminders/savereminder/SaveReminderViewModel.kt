@@ -1,6 +1,7 @@
 package com.udacity.project4.locationreminders.savereminder
 
 import android.app.Application
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.google.android.gms.maps.model.PointOfInterest
@@ -14,12 +15,27 @@ import kotlinx.coroutines.launch
 
 class SaveReminderViewModel(val app: Application, val dataSource: ReminderDataSource) :
     BaseViewModel(app) {
+
     val reminderTitle = MutableLiveData<String>()
     val reminderDescription = MutableLiveData<String>()
-    val reminderSelectedLocationStr = MutableLiveData<String>()
-    val selectedPOI = MutableLiveData<PointOfInterest>()
-    val latitude = MutableLiveData<Double>()
-    val longitude = MutableLiveData<Double>()
+    private val _reminderSelectedLocationStr = MutableLiveData<String>()
+    private val _selectedPOI = MutableLiveData<PointOfInterest>()
+    private val _latitude = MutableLiveData<Double>()
+    private val _longitude = MutableLiveData<Double>()
+
+
+    val reminderSelectedLocationStr: LiveData<String>
+        get() = _reminderSelectedLocationStr
+
+    val selectedPOI: LiveData<PointOfInterest>
+        get() = _selectedPOI
+
+    val latitude: LiveData<Double>
+        get() = _latitude
+
+    val longitude: LiveData<Double>
+        get() = _longitude
+
 
     /**
      * Clear the live data objects to start fresh next time the view model gets called
@@ -27,10 +43,10 @@ class SaveReminderViewModel(val app: Application, val dataSource: ReminderDataSo
     fun onClear() {
         reminderTitle.value = null
         reminderDescription.value = null
-        reminderSelectedLocationStr.value = null
-        selectedPOI.value = null
-        latitude.value = null
-        longitude.value = null
+        _reminderSelectedLocationStr.value = null
+        _selectedPOI.value = null
+        _latitude.value = null
+        _longitude.value = null
     }
 
     /**
@@ -78,5 +94,29 @@ class SaveReminderViewModel(val app: Application, val dataSource: ReminderDataSo
             return false
         }
         return true
+    }
+
+    fun setReminderTitle(title: String) {
+        reminderTitle.value = title
+    }
+
+    fun setReminderDescription(description: String) {
+        reminderDescription.value = description
+    }
+
+    fun setReminderSelectedLocationStr(reminderSelectedLocationStr: String) {
+        _reminderSelectedLocationStr.value = reminderSelectedLocationStr
+    }
+
+    fun setSelectedPoi(poi: PointOfInterest) {
+        _selectedPOI.value = poi
+    }
+
+    fun setLatitude(latitude: Double) {
+        _latitude.value = latitude
+    }
+
+    fun setLongitude(longitude: Double) {
+        _longitude.value = longitude
     }
 }

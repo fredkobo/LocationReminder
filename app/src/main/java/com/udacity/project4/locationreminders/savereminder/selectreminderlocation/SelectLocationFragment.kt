@@ -84,10 +84,10 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback, GoogleMap.OnP
 
     private fun onLocationSelected() {
         if (this::selectedPoi.isInitialized) {
-            _viewModel.latitude.value = selectedPoi.latLng.latitude
-            _viewModel.longitude.value = selectedPoi.latLng.longitude
-            _viewModel.reminderSelectedLocationStr.value = selectedPoi.name
-            _viewModel.selectedPOI.value = selectedPoi
+            _viewModel.setLatitude(selectedPoi.latLng.latitude)
+            _viewModel.setLongitude(selectedPoi.latLng.longitude)
+            _viewModel.setReminderSelectedLocationStr(selectedPoi.name)
+            _viewModel.setSelectedPoi(selectedPoi)
         }
         findNavController().popBackStack()
     }
