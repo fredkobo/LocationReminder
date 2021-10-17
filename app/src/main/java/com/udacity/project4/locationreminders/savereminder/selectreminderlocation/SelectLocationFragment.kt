@@ -30,6 +30,7 @@ import java.util.*
 
 
 class SelectLocationFragment : BaseFragment(), OnMapReadyCallback, GoogleMap.OnPoiClickListener,
+    GoogleMap.OnMapLongClickListener,
     LocationListener {
 
     //Use Koin to get the view model of the SaveReminder
@@ -111,6 +112,7 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback, GoogleMap.OnP
         enableMyLocation()
         setMapStyle(googleMap)
         map.setOnPoiClickListener(this)
+        map.setOnMapLongClickListener(this)
     }
 
     @SuppressLint("MissingPermission")
@@ -216,6 +218,11 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback, GoogleMap.OnP
     override fun onPoiClick(poi: PointOfInterest) {
         selectedPoi = PointOfInterest(poi.latLng, poi.placeId, poi.name)
         showMarker(poi.latLng.latitude, poi.latLng.longitude, poi.name)
+    }
+
+    override fun onMapLongClick(latLng: LatLng) {
+        selectedPoi = PointOfInterest(latLng, null, getString(R.string.dropped_pin))
+        showMarker(latLng.latitude, latLng.longitude, getString(R.string.dropped_pin))
     }
 
     private fun showMarker(lat: Double, lng: Double, title: String) {
