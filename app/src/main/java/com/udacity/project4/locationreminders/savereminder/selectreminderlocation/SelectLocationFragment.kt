@@ -118,16 +118,13 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback, GoogleMap.OnP
     @SuppressLint("MissingPermission")
     private fun enableMyLocation() {
         if (isPermissionGranted()) {
-            map.setMyLocationEnabled(true)
+            map.isMyLocationEnabled = true
             getDeviceLocation()
         } else {
-            activity?.let {
-                ActivityCompat.requestPermissions(
-                    it,
-                    arrayOf<String>(Manifest.permission.ACCESS_FINE_LOCATION),
-                    REQUEST_LOCATION_PERMISSION
-                )
-            }
+            requestPermissions(
+                arrayOf<String>(Manifest.permission.ACCESS_FINE_LOCATION),
+                REQUEST_LOCATION_PERMISSION
+            )
         }
     }
 
