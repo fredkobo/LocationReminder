@@ -115,10 +115,10 @@ class SaveReminderFragmentTest {
         val latlng = LatLng(validDataItem.latitude!!, validDataItem.longitude!!)
         viewModel.reminderTitle.value = validDataItem.title
         viewModel.reminderDescription.value = validDataItem.description
-        viewModel.latitude.value = validDataItem.latitude
-        viewModel.longitude.value = validDataItem.longitude
-        viewModel.reminderSelectedLocationStr.value = null
-        viewModel.selectedPOI.value = PointOfInterest(latlng, validDataItem.location, "this")
+        viewModel.setLatitude(validDataItem.latitude!!)
+        viewModel.setLongitude(validDataItem.longitude!!)
+        viewModel.setReminderDescription("")
+        viewModel.setSelectedPoi(PointOfInterest(latlng, validDataItem.location, "this"))
 
         val navController = mock(NavController::class.java)
         val scenario =
@@ -148,10 +148,10 @@ class SaveReminderFragmentTest {
         val latlng = LatLng(validDataItem.latitude!!, validDataItem.longitude!!)
         viewModel.reminderTitle.value = validDataItem.title
         viewModel.reminderDescription.value = validDataItem.description
-        viewModel.reminderSelectedLocationStr.value = validDataItem.locationString
-        viewModel.latitude.value = validDataItem.latitude
-        viewModel.longitude.value = validDataItem.longitude
-        viewModel.selectedPOI.value = PointOfInterest(latlng, validDataItem.location, "this")
+        viewModel.setReminderSelectedLocationStr(validDataItem.locationString)
+        viewModel.setLatitude(validDataItem.latitude!!)
+        viewModel.setLongitude(validDataItem.longitude!!)
+        viewModel.setSelectedPoi(PointOfInterest(latlng, validDataItem.location, "this"))
 
         val navController = mock(NavController::class.java)
         val scenario =
