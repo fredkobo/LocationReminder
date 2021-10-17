@@ -65,18 +65,14 @@ class SaveReminderFragment : BaseFragment() {
         }
 
         binding.saveReminder.setOnClickListener {
-            val title = _viewModel.reminderTitle.value
-            val description = _viewModel.reminderDescription.value
-            val location = _viewModel.reminderSelectedLocationStr.value
-            val latitude = _viewModel.latitude.value
-            val longitude = _viewModel.longitude.value
-
-            reminderDataItem = ReminderDataItem(title, description, location, latitude, longitude)
-            val saved = _viewModel.validateAndSaveReminder(reminderDataItem)
-
-            if (saved) {
-                checkPermissionsAndStartGeofencing()
-            }
+            reminderDataItem = ReminderDataItem(
+                _viewModel.reminderTitle.value,
+                _viewModel.reminderDescription.value,
+                _viewModel.reminderSelectedLocationStr.value,
+                _viewModel.latitude.value,
+                _viewModel.longitude.value
+            )
+            checkPermissionsAndStartGeofencing()
         }
     }
 
@@ -118,13 +114,10 @@ class SaveReminderFragment : BaseFragment() {
             else -> REQUEST_FOREGROUND_ONLY_PERMISSIONS_REQUEST_CODE
         }
         Log.d(TAG, "Request foreground only location permission")
-        activity?.let {
-            ActivityCompat.requestPermissions(
-                it,
-                permissionsArray,
-                resultCode
-            )
-        }
+        requestPermissions(
+            permissionsArray,
+            resultCode
+        )
     }
 
     private fun checkPermissionsAndStartGeofencing() {
@@ -177,9 +170,14 @@ class SaveReminderFragment : BaseFragment() {
         locationSettingsResponseTask?.addOnFailureListener { exception ->
             if (exception is ResolvableApiException && resolve) {
                 try {
-                    exception.startResolutionForResult(
-                        activity,
-                        REQUEST_TURN_DEVICE_LOCATION_ON
+                    startIntentSenderForResult(
+                        exception.resolution.intentSender,
+                        REQUEST_TURN_DEVICE_LOCATION_ON,
+                        null,
+                        0,
+                        0,
+                        0,
+                        null
                     )
                 } catch (sendEx: IntentSender.SendIntentException) {
                     Log.d(TAG, "Error getting location settings resolution: " + sendEx.message)
@@ -236,6 +234,7 @@ class SaveReminderFragment : BaseFragment() {
                     TAG,
                     "Added geofence for reminder with id ${reminderDataItem.id} successfully."
                 )
+                _viewModel.validateAndSaveReminder(reminderDataItem)
             }
             addOnFailureListener {
                 _viewModel.showErrorMessage.postValue(getString(R.string.error_adding_geofence))

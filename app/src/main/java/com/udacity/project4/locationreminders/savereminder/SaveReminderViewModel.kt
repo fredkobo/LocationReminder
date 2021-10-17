@@ -36,12 +36,10 @@ class SaveReminderViewModel(val app: Application, val dataSource: ReminderDataSo
     /**
      * Validate the entered data then saves the reminder data to the DataSource
      */
-    fun validateAndSaveReminder(reminderData: ReminderDataItem): Boolean {
+    fun validateAndSaveReminder(reminderData: ReminderDataItem) {
         if (validateEnteredData(reminderData)) {
             saveReminder(reminderData)
-            return true
         }
-        return false
     }
 
     /**
