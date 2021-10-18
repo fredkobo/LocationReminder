@@ -41,16 +41,6 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback, GoogleMap.OnP
     private lateinit var map: GoogleMap
     private lateinit var selectedPoi: PointOfInterest
 
-    private val locationPermissions =
-        if (Build.VERSION.SDK_INT == Build.VERSION_CODES.Q) {
-            arrayOf(
-                Manifest.permission.ACCESS_FINE_LOCATION,
-                Manifest.permission.ACCESS_BACKGROUND_LOCATION
-            )
-        } else {
-            arrayOf(Manifest.permission.ACCESS_FINE_LOCATION)
-        }
-
     companion object {
         const val TAG = "SelectLocationFragment"
         const val REQUEST_LOCATION_PERMISSION = 1
@@ -132,7 +122,10 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback, GoogleMap.OnP
             map.isMyLocationEnabled = true
             getDeviceLocation()
         } else {
-            requestPermissions(locationPermissions, REQUEST_LOCATION_PERMISSION)
+            requestPermissions(
+                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+                REQUEST_LOCATION_PERMISSION
+            )
         }
     }
 
