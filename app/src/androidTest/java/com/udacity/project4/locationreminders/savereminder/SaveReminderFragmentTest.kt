@@ -94,6 +94,10 @@ class SaveReminderFragmentTest {
         scenario.onFragment {
             Navigation.setViewNavController(it.view!!, navController)
         }
+        viewModel.setReminderDescription("This is a short description");
+        viewModel.setReminderSelectedLocationStr("The tree house")
+        viewModel.setLatitude(2.344234234)
+        viewModel.setLongitude(0.34875)
 
         onView(withId(R.id.saveReminder)).perform(click())
         assertThat(viewModel.showSnackBarInt.getOrAwaitValueX()).isEqualTo(R.string.err_enter_title)
