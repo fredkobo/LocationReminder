@@ -79,7 +79,10 @@ class SaveReminderFragment : BaseFragment() {
                 _viewModel.latitude.value,
                 _viewModel.longitude.value
             )
-            checkPermissionsAndStartGeofencing()
+
+            if (_viewModel.validateEnteredData(reminderDataItem)) {
+                checkPermissionsAndStartGeofencing()
+            }
         }
     }
 
