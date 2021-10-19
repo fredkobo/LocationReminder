@@ -6,12 +6,11 @@ import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.IdlingRegistry
 import androidx.test.espresso.action.ViewActions
+import androidx.test.espresso.action.ViewActions.longClick
 import androidx.test.espresso.assertion.ViewAssertions
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.PointOfInterest
 import com.udacity.project4.locationreminders.RemindersActivity
 import com.udacity.project4.locationreminders.data.ReminderDataSource
 import com.udacity.project4.locationreminders.data.local.LocalDB
@@ -143,12 +142,15 @@ class RemindersActivityTest :
             .perform(ViewActions.replaceText("TITLE"))
         onView(withId(R.id.reminderDescription))
             .perform(ViewActions.replaceText("DESCRIPTION"))
+        onView(withId(R.id.selectLocation)).perform(ViewActions.click())
 
+        Thread.sleep(3000)
 
-        viewModel.setSelectedPoi(PointOfInterest(LatLng(0.0, 0.0), "TestLocation", "ID"))
-        viewModel.setReminderSelectedLocationStr("TestLocation")
-        viewModel.setLatitude(0.0)
-        viewModel.setLongitude(0.0)
+        onView(withContentDescription("Google Map")).perform(longClick())
+
+        Thread.sleep(1000)
+
+        onView(withId(R.id.save_button)).perform(ViewActions.click())
 
         onView(withId(R.id.saveReminder)).perform(ViewActions.click())
 
